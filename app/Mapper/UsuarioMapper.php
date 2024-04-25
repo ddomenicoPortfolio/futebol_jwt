@@ -31,6 +31,10 @@ class UsuarioMapper {
         if(isset($regDatabase['senha']))
             $obj->setSenha($regDatabase['senha']);
         
+        if(isset($regDatabase['foto_perfil']))
+            $obj->setFotoPerfil($regDatabase['foto_perfil']);
+        
+
         return $obj;
     }
 

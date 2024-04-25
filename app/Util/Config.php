@@ -12,6 +12,10 @@ class Config {
 
     const TOKEN_KEY = "fdsfasdfsad543hfgdh4645hdh43543hretre";
     const TOKEN_ALGO = "HS512";
+
+    const PATH_FILES = __DIR__ . "/../../files";
+
+    const REQUIRES_AUTHENTICATION = true;
 }
 
 

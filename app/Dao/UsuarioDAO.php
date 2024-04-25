@@ -64,4 +64,15 @@ class UsuarioDAO {
             return $arrayObj[0];
     }
 
+    public function updateFotoPerfil(int $idUsuario, string $nomeFotoPerfil) {
+        $sql = 'UPDATE usuarios SET foto_perfil = :foto_perfil WHERE id = :id';
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue("foto_perfil", $nomeFotoPerfil);
+        $stmt->bindValue("id", $idUsuario);
+        $stmt->execute();
+
+        return $nomeFotoPerfil;
+    }
+
 }

@@ -8,23 +8,35 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Dao\ClubeDAO;
 use App\Mapper\ClubeMapper;
 use App\Service\ClubeService;
+use App\Service\TokenService;
 use App\Util\MensagemErro;
 
 use \PDOException;
+use Throwable;
 
 class ClubeController {
 
 	private $clubeDAO;
 	private $clubeMapper;
 	private $clubeService;
+	private TokenService $tokenService;
 
 	public function __construct() {
 		$this->clubeDAO = new ClubeDAO();
 		$this->clubeMapper = new ClubeMapper();
 		$this->clubeService = new ClubeService();
+		$this->tokenService = new TokenService();
 	}
 
     public function listar(Request $request, Response $response, array $args): Response {
+		//Valida o token de acesso do usuário
+		try {
+			$this->tokenService->validarToken($request);
+		} catch(Throwable $e) {
+			//Retorna FORBIDDEN
+			return MensagemErro::getResponseErro($response, "Token inválido", $e->getMessage(), 401);
+		}
+
 		$dados = $this->clubeDAO->list();
 		
 		$json = json_encode($dados, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
@@ -36,6 +48,14 @@ class ClubeController {
     }
 
 	public function buscarPorId(Request $request, Response $response, array $args): Response {
+		//Valida o token de acesso do usuário
+		try {
+			$this->tokenService->validarToken($request);
+		} catch(Throwable $e) {
+			//Retorna FORBIDDEN
+			return MensagemErro::getResponseErro($response, "Token inválido", $e->getMessage(), 401);
+		}
+
 		$id = $args['id'];
 		$clube = $this->clubeDAO->findById($id);
 		
@@ -52,6 +72,14 @@ class ClubeController {
     }
 
 	public function inserir(Request $request, Response $response, array $args): Response {
+		//Valida o token de acesso do usuário
+		try {
+			$this->tokenService->validarToken($request);
+		} catch(Throwable $e) {
+			//Retorna FORBIDDEN
+			return MensagemErro::getResponseErro($response, "Token inválido", $e->getMessage(), 401);
+		}
+
 		//Carrega o clube que veio na requisição em formato JSON
 		$clubeArrayAssoc = $request->getParsedBody(); //Retorna um array a partir do JSON
 		$clube = $this->clubeMapper->mapFromJsonToObject($clubeArrayAssoc);
@@ -84,6 +112,14 @@ class ClubeController {
     }
 
 	public function atualizar(Request $request, Response $response, array $args): Response {
+		//Valida o token de acesso do usuário
+		try {
+			$this->tokenService->validarToken($request);
+		} catch(Throwable $e) {
+			//Retorna FORBIDDEN
+			return MensagemErro::getResponseErro($response, "Token inválido", $e->getMessage(), 401);
+		}
+
 		$id = $args['id'];
 		$clube = $this->clubeDAO->findById($id);
 		
@@ -115,6 +151,14 @@ class ClubeController {
     }
 
 	public function deletar(Request $request, Response $response, array $args): Response {
+		//Valida o token de acesso do usuário
+		try {
+			$this->tokenService->validarToken($request);
+		} catch(Throwable $e) {
+			//Retorna FORBIDDEN
+			return MensagemErro::getResponseErro($response, "Token inválido", $e->getMessage(), 401);
+		}
+
 		$id = $args['id'];
 		$clube = $this->clubeDAO->findById($id);
 		

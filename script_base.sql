@@ -27,3 +27,5 @@ CREATE TABLE usuarios (
 );
 INSERT INTO usuarios (nome, login, senha) VALUES ("Sr. Administrador", "admin", "$2y$10$ox60hFa.Am8h0JySNSRPOeJLcsc.jtTJXGlrTEi8HAUBIWN1aUGSC");
 INSERT INTO usuarios (nome, login, senha) VALUES ("Sr. Root", "root", "$2y$10$HAcQbccHfVZMcDUTqlYI8OJv0BcwR7VeL9z2gUMf.KMgSUxOHmPF.");
+
+ALTER TABLE usuarios ADD COLUMN foto_perfil VARCHAR(255);

@@ -10,16 +10,19 @@ class Usuario implements JsonSerializable {
     private ?string $nome;
     private ?string $login;
     private ?string $senha;
+    private ?string $fotoPerfil;
 
     public function __construct() {
         $this->id = 0;
+        $this->fotoPerfil = "";
     }
 
     public function jsonSerialize() : array {
         return array(
             "id" => $this->id,
             "nome" => $this->nome,
-            "login" => $this->login
+            "login" => $this->login,
+            "fotoPerfil" => $this->fotoPerfil
         ); 
     }
 
@@ -71,4 +74,15 @@ class Usuario implements JsonSerializable {
         return $this;
     }
 
+    public function getFotoPerfil(): ?string
+    {
+        return $this->fotoPerfil;
+    }
+
+    public function setFotoPerfil(?string $fotoPerfil): self
+    {
+        $this->fotoPerfil = $fotoPerfil;
+
+        return $this;
+    }
 }

@@ -14,9 +14,11 @@ use Throwable;
 class AutenticacaoController {
 
 	private $usuarioDAO;
+	private TokenService $tokenService;
 	
 	public function __construct() {
 		$this->usuarioDAO = new UsuarioDAO();
+		$this->tokenService = new TokenService();
 	}
 
 	public function autenticar(Request $request, Response $response, array $args): Response {
@@ -28,7 +30,7 @@ class AutenticacaoController {
 		if($usuario) {
 			
 			if(password_verify($usuarioArray['senha'], $usuario->getSenha())) {
-				$token = TokenService::gerarToken($usuario);
+				$token = $this->tokenService->gerarToken($usuario);
 
 				$retorno = TokenJWTUsuario::getJSON($token, 
 								$usuario->getId(), $usuario->getNome());
@@ -48,34 +50,40 @@ class AutenticacaoController {
     }
 
 	public function verificar(Request $request, Response $response, array $args): Response {
-		//Recebe o token da requisição
-		$authTokens = $request->getHeader("Authorization");// $_SERVER['HTTP_AUTHORIZATION'];
-		$authToken = "";
-		if($authTokens)
-			$authToken = trim(str_replace("Bearer", "", $authTokens[0]));
+		try{
+			$this->tokenService->validarToken($request);
+			
+			$dadosToken = $this->tokenService->getDadosFromToken($request);
 
-		$erro = "";
-		if($authToken) {
-			try{
-				$dadosToken = TokenService::decodificarToken($authToken);
-
-				if(TokenService::validarToken($dadosToken)) {
-					$response->getBody()->write(json_encode($dadosToken));
-					return $response
-						->withHeader('Content-Type', 'application/json')
-						->withStatus(200); //OK
-				}
-
-			} catch(Throwable $e) {
-				$erro = $e->getMessage();
-			}
-		}
-
-		//Caso token seja inválido, retorna FORBIDDEN
-		$response->getBody()->write(MensagemErro::getJSONErro("Token inválido!", $erro, 401));
-		return $response
+			$response->getBody()->write(json_encode($dadosToken));
+			return $response
 				->withHeader('Content-Type', 'application/json')
-				->withStatus(401); //FORBIDDEN
+				->withStatus(200); //OK
+		} catch(Throwable $e) {
+			//Caso token seja inválido, retorna FORBIDDEN
+			return MensagemErro::getResponseErro($response, "Token inválido!", $e->getMessage(), 401);
+		}
+	}
+
+	public function perfil(Request $request, Response $response, array $args): Response {
+		$erro = "";
+		try{
+			$usuario = $this->tokenService->getUsuarioFromToken($request);
+
+			if($usuario) {
+				$response->getBody()->write(json_encode($usuario));
+				return $response
+					->withHeader('Content-Type', 'application/json')
+					->withStatus(200); //OK
+			} else
+				$erro = "Usuário não encontrado!";
+
+		} catch(Throwable $e) {
+			$erro = $e->getMessage();
+		}	
+		
+		//Caso token seja inválido, retorna FORBIDDEN
+		return MensagemErro::getResponseErro($response, "Token inválido!", $erro, 401);
 	}
 
 }

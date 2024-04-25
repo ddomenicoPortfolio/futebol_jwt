@@ -7,6 +7,7 @@ use Slim\Factory\AppFactory;
 use App\Controller\AutenticacaoController;
 use App\Controller\ClubeController;
 use App\Controller\JogadorController;
+use App\Controller\UsuarioController;
 use Slim\Exception\HttpNotFoundException;
 
 //require_once(__DIR__ . '/../vendor/autoload.php');
@@ -64,6 +65,12 @@ $app->get('/hello2', function (Request $request, Response $response, $args) {
 //Autenticação
 $app->post('/autenticacao', AutenticacaoController::class . ':autenticar');
 $app->get('/autenticacao/validar', AutenticacaoController::class . ':verificar');
+
+//Perfil
+$app->get('/autenticacao/me', AutenticacaoController::class . ':perfil');
+
+$app->get('/usuarios/foto/{id}', UsuarioController::class . ':perfilFoto');
+$app->post('/usuarios/foto/{id}', UsuarioController::class . ':perfilFotoAtualizar'); //Precisa ser POST
 
 //Clubes
 //$app->get('/clubes', ClubeController::class . ':listar');
